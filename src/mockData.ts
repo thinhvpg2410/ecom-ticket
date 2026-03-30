@@ -1,0 +1,347 @@
+export type UserRole = "customer" | "admin" | "organizer";
+
+export type User = {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  role: UserRole;
+  avatarUrl?: string;
+  avatarBase64?: string;
+  dateOfBirth?: string;
+  createdAt: string;
+  status: "active" | "inactive";
+};
+
+export type PaymentMethod = {
+  id: string;
+  userId: string;
+  type: "momo" | "visa" | "vnpay";
+  providerLabel: string;
+  holderName?: string;
+  brand?: string;
+  last4?: string;
+  expiryMonth?: number;
+  expiryYear?: number;
+  walletPhone?: string;
+  tokenRef: string;
+  billingAddress?: {
+    line1: string;
+    district?: string;
+    city: string;
+    country: string;
+    postalCode?: string;
+  };
+  status: "active" | "disabled";
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CartItem = {
+  id: string;
+  eventId: string;
+  ticketId: string;
+  quantity: number;
+  unitPrice: number;
+};
+
+export type Cart = {
+  id: string;
+  userId: string;
+  currency: "VND";
+  items: CartItem[];
+  subtotal: number;
+  updatedAt: string;
+};
+
+export type OrderItem = {
+  id: string;
+  eventId: string;
+  ticketId: string;
+  ticketName: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+};
+
+export type Order = {
+  id: string;
+  userId: string;
+  status: "pending" | "paid" | "cancelled" | "refunded";
+  currency: "VND";
+  items: OrderItem[];
+  subtotal: number;
+  discount: number;
+  fee: number;
+  total: number;
+  createdAt: string;
+  paidAt?: string;
+};
+
+export type Payment = {
+  id: string;
+  orderId: string;
+  userId: string;
+  methodId: string;
+  provider: "momo" | "visa" | "vnpay";
+  amount: number;
+  currency: "VND";
+  status: "initiated" | "success" | "failed" | "refunded";
+  transactionRef: string;
+  createdAt: string;
+  confirmedAt?: string;
+};
+
+export type UserTicket = {
+  id: string;
+  userId: string;
+  orderId: string;
+  eventId: string;
+  ticketId: string;
+  qrCode: string;
+  barcode: string;
+  status: "valid" | "used" | "expired" | "cancelled";
+  issuedAt: string;
+};
+
+export const users: User[] = [
+  {
+    id: "u_001",
+    fullName: "Tran Ngoc Bich Ly",
+    email: "bichly@example.com",
+    phone: "0901234567",
+    role: "customer",
+    avatarUrl: "https://example.com/avatar/u_001.png",
+    createdAt: "2026-03-01T08:20:00Z",
+    status: "active",
+  },
+  {
+    id: "u_002",
+    fullName: "Nguyen Minh Quan",
+    email: "quan@example.com",
+    phone: "0912345678",
+    role: "customer",
+    createdAt: "2026-03-05T10:10:00Z",
+    status: "active",
+  },
+  {
+    id: "u_003",
+    fullName: "ECOM Admin",
+    email: "admin@ecomticket.vn",
+    phone: "0988888888",
+    role: "admin",
+    createdAt: "2026-02-20T02:30:00Z",
+    status: "active",
+  },
+];
+
+export const paymentMethodsByUser: Record<string, PaymentMethod[]> = {
+  u_001: [
+    {
+      id: "pm_001",
+      userId: "u_001",
+      type: "momo",
+      providerLabel: "Momo Wallet",
+      walletPhone: "0901234567",
+      tokenRef: "tok_momo_u001_01",
+      status: "active",
+      isDefault: true,
+      createdAt: "2026-03-01T08:30:00Z",
+      updatedAt: "2026-03-25T01:10:00Z",
+    },
+    {
+      id: "pm_002",
+      userId: "u_001",
+      type: "visa",
+      providerLabel: "VISA •••• 3490",
+      holderName: "TRAN NGOC BICH LY",
+      brand: "VISA",
+      last4: "3490",
+      expiryMonth: 12,
+      expiryYear: 2028,
+      tokenRef: "tok_card_u001_02",
+      billingAddress: {
+        line1: "12 Nguyen Hue",
+        district: "Quan 1",
+        city: "Ho Chi Minh",
+        country: "VN",
+        postalCode: "700000",
+      },
+      status: "active",
+      isDefault: false,
+      createdAt: "2026-03-06T10:00:00Z",
+      updatedAt: "2026-03-06T10:00:00Z",
+    },
+  ],
+  u_002: [
+    {
+      id: "pm_003",
+      userId: "u_002",
+      type: "vnpay",
+      providerLabel: "VNPay Mobile Banking",
+      tokenRef: "tok_vnpay_u002_01",
+      status: "active",
+      isDefault: true,
+      createdAt: "2026-03-12T05:12:00Z",
+      updatedAt: "2026-03-12T05:12:00Z",
+    },
+  ],
+};
+
+export const paymentMethods: PaymentMethod[] = Object.values(
+  paymentMethodsByUser,
+).flat();
+
+export const carts: Cart[] = [
+  {
+    id: "cart_001",
+    userId: "u_001",
+    currency: "VND",
+    items: [
+      {
+        id: "ci_001",
+        eventId: "e2",
+        ticketId: "e2-1",
+        quantity: 2,
+        unitPrice: 250000,
+      },
+      {
+        id: "ci_002",
+        eventId: "e11",
+        ticketId: "e11-1",
+        quantity: 1,
+        unitPrice: 150000,
+      },
+    ],
+    subtotal: 650000,
+    updatedAt: "2026-03-30T03:55:00Z",
+  },
+  {
+    id: "cart_002",
+    userId: "u_002",
+    currency: "VND",
+    items: [
+      {
+        id: "ci_003",
+        eventId: "e4",
+        ticketId: "e4-1",
+        quantity: 1,
+        unitPrice: 120000,
+      },
+    ],
+    subtotal: 120000,
+    updatedAt: "2026-03-29T14:20:00Z",
+  },
+];
+
+export const orders: Order[] = [
+  {
+    id: "ord_1001",
+    userId: "u_001",
+    status: "paid",
+    currency: "VND",
+    items: [
+      {
+        id: "oi_001",
+        eventId: "e2",
+        ticketId: "e2-1",
+        ticketName: "Standard",
+        quantity: 2,
+        unitPrice: 250000,
+        lineTotal: 500000,
+      },
+    ],
+    subtotal: 500000,
+    discount: 0,
+    fee: 0,
+    total: 500000,
+    createdAt: "2026-03-30T04:10:00Z",
+    paidAt: "2026-03-30T04:12:00Z",
+  },
+  {
+    id: "ord_1002",
+    userId: "u_002",
+    status: "pending",
+    currency: "VND",
+    items: [
+      {
+        id: "oi_002",
+        eventId: "e4",
+        ticketId: "e4-1",
+        ticketName: "Standard",
+        quantity: 1,
+        unitPrice: 120000,
+        lineTotal: 120000,
+      },
+    ],
+    subtotal: 120000,
+    discount: 10000,
+    fee: 0,
+    total: 110000,
+    createdAt: "2026-03-30T05:00:00Z",
+  },
+];
+
+export const payments: Payment[] = [
+  {
+    id: "pay_9001",
+    orderId: "ord_1001",
+    userId: "u_001",
+    methodId: "pm_001",
+    provider: "momo",
+    amount: 500000,
+    currency: "VND",
+    status: "success",
+    transactionRef: "MOMO-TRX-20260330-0001",
+    createdAt: "2026-03-30T04:11:00Z",
+    confirmedAt: "2026-03-30T04:12:00Z",
+  },
+  {
+    id: "pay_9002",
+    orderId: "ord_1002",
+    userId: "u_002",
+    methodId: "pm_003",
+    provider: "vnpay",
+    amount: 110000,
+    currency: "VND",
+    status: "initiated",
+    transactionRef: "VNPAY-TRX-20260330-0002",
+    createdAt: "2026-03-30T05:01:00Z",
+  },
+];
+
+export const userTickets: UserTicket[] = [
+  {
+    id: "ut_001",
+    userId: "u_001",
+    orderId: "ord_1001",
+    eventId: "e2",
+    ticketId: "e2-1",
+    qrCode: "ECOM-QR-ut_001",
+    barcode: "ECOM-BAR-ut_001",
+    status: "valid",
+    issuedAt: "2026-03-30T04:13:00Z",
+  },
+  {
+    id: "ut_002",
+    userId: "u_001",
+    orderId: "ord_1001",
+    eventId: "e2",
+    ticketId: "e2-1",
+    qrCode: "ECOM-QR-ut_002",
+    barcode: "ECOM-BAR-ut_002",
+    status: "valid",
+    issuedAt: "2026-03-30T04:13:00Z",
+  },
+];
+
+export const mockData = {
+  users,
+  paymentMethodsByUser,
+  paymentMethods,
+  carts,
+  orders,
+  payments,
+  userTickets,
+};
