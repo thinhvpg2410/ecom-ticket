@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Ionicons } from "@expo/vector-icons";
 
 import type { RootStackParamList } from "../navigation/AppNavigator";
 import type { Province } from "../data";
@@ -18,6 +19,13 @@ export default function ProvinceListScreen({ route, navigation }: Props) {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => navigation.goBack()}
+          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+        >
+          <Ionicons name="arrow-back" size={20} color={COLORS.primary} />
+        </Pressable>
         <Text style={styles.title}>Khác</Text>
       </View>
 
@@ -48,9 +56,25 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.sm,
     paddingHorizontal: SPACING.xl,
     paddingTop: SPACING.xl,
     paddingBottom: SPACING.md,
+  },
+  backBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.input,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  backBtnPressed: {
+    opacity: 0.85,
   },
   title: {
     color: COLORS.text,

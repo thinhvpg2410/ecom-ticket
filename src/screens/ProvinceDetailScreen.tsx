@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Ionicons } from "@expo/vector-icons";
 
 import type { RootStackParamList } from "../navigation/AppNavigator";
 import { provinces } from "../data";
@@ -59,6 +60,15 @@ export default function ProvinceDetailScreen({ route, navigation }: Props) {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => navigation.goBack()}
+          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+        >
+          <Ionicons name="arrow-back" size={20} color={COLORS.primary} />
+          <Text style={styles.backText}>Quay lại</Text>
+        </Pressable>
+
         <Image source={{ uri: province.image }} style={styles.hero} />
 
         <View style={styles.card}>
@@ -106,6 +116,27 @@ export default function ProvinceDetailScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.background },
   scroll: { padding: SPACING.xl },
+  backBtn: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: COLORS.input,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginBottom: SPACING.md,
+  },
+  backBtnPressed: {
+    opacity: 0.85,
+  },
+  backText: {
+    color: COLORS.text,
+    fontWeight: "800",
+    fontSize: 13,
+  },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   error: {
     color: COLORS.mutedText,
