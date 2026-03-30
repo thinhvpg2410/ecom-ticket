@@ -26,6 +26,8 @@ export type InputFieldProps = {
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   autoCorrect?: boolean;
   textContentType?: TextInputProps["textContentType"];
+  returnKeyType?: TextInputProps["returnKeyType"];
+  onSubmitEditing?: TextInputProps["onSubmitEditing"];
 };
 
 export default function InputField({
@@ -41,6 +43,8 @@ export default function InputField({
   autoCapitalize = "none",
   autoCorrect = false,
   textContentType,
+  returnKeyType = "search",
+  onSubmitEditing,
 }: InputFieldProps) {
   const [focused, setFocused] = useState(false);
 
@@ -72,6 +76,8 @@ export default function InputField({
           autoCapitalize={autoCapitalize}
           autoCorrect={autoCorrect}
           textContentType={textContentType}
+          returnKeyType={returnKeyType}
+          onSubmitEditing={onSubmitEditing}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           style={[styles.input, !!leftIconName && styles.inputWithIcon]}

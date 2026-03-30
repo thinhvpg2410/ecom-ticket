@@ -15,16 +15,18 @@ type UserTicketRow = {
   id: string;
   order_id: string;
   ticket_id: string;
+  event_id: string;
   issued_at: string;
   status: "valid" | "used" | "expired" | "cancelled";
-  events: {
-    id: string;
-    title: string;
-    image_url: string | null;
-    date_display: string;
-    location: string;
-    status: "draft" | "published" | "cancelled" | "ended";
-  }[] | null;
+};
+
+type EventRow = {
+  id: string;
+  title: string;
+  image_url: string | null;
+  date_display: string;
+  location: string;
+  status: "draft" | "published" | "cancelled" | "ended";
 };
 
 type OrderItemRow = {
@@ -63,10 +65,10 @@ function formatDateTime(iso: string) {
 
 function toMyTicket(
   row: UserTicketRow,
+  event: EventRow | null,
   user: { fullName: string; email: string; phone: string },
   unitPriceByOrderItem: Map<string, number>,
 ): MyTicket {
-  const event = row.events?.[0] ?? null;
   const dateAndTime = splitDateAndTime(event?.date_display ?? "—");
   const unitPrice = unitPriceByOrderItem.get(`${row.order_id}:${row.ticket_id}`) ?? 0;
 
@@ -121,23 +123,7 @@ export async function fetchMyTickets(params: {
 
   const { data: rows, error } = await supabase
     .from("user_tickets")
-    .select(
-      `
-      id,
-      order_id,
-      ticket_id,
-      issued_at,
-      status,
-      events:event_id (
-        id,
-        title,
-        image_url,
-        date_display,
-        location,
-        status
-      )
-    `,
-    )
+    .select("id, order_id, ticket_id, event_id, issued_at, status")
     .eq("user_id", userId)
     .order("issued_at", { ascending: false });
 
@@ -148,6 +134,24 @@ export async function fetchMyTickets(params: {
   const userTickets = (rows ?? []) as UserTicketRow[];
   if (!userTickets.length) {
     return [];
+  }
+
+  const eventIds = Array.from(new Set(userTickets.map((item) => item.event_id).filter(Boolean)));
+
+  const eventById = new Map<string, EventRow>();
+  if (eventIds.length > 0) {
+    const { data: eventRows, error: eventsError } = await supabase
+      .from("events")
+      .select("id, title, image_url, date_display, location, status")
+      .in("id", eventIds);
+
+    if (eventsError) {
+      throw new Error(eventsError.message);
+    }
+
+    for (const e of (eventRows ?? []) as EventRow[]) {
+      eventById.set(e.id, e);
+    }
   }
 
   const orderIds = Array.from(new Set(userTickets.map((item) => item.order_id)));
@@ -166,6 +170,6 @@ export async function fetchMyTickets(params: {
   }
 
   return userTickets.map((row) =>
-    toMyTicket(row, { fullName, email, phone }, unitPriceByOrderItem),
+    toMyTicket(row, eventById.get(row.event_id) ?? null, { fullName, email, phone }, unitPriceByOrderItem),
   );
 }
