@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #0b0b0b;
+  color: #f5f5f5;
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@layer components {
+  .input-admin {
+    @apply w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-white outline-none focus:border-red-500;
+  }
+}
